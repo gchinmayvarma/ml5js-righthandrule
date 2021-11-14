@@ -15,8 +15,9 @@ let animation_frame = 0;
 let voal;
 let readytoshow = false;
 let imagesloaded = false;
-let newer = 1 ; 
-let mirrar = 1 ; 
+let newer = 1;
+let mirrar = 1;
+let videoface = "environment";
 function modelReady() {
   // console.log("Model ready!");
   readytoshow = true;
@@ -27,10 +28,10 @@ function modelReady() {
   video.size(x * newer, y * newer);
   // monapple.resizeCanvas( video.width/zoomscale , video.height/zoomscale) ;
   // canvas.style("zoom" , zoomscale*100 + "%") ;
+  infoimg.size(infoimg.width * 1.5, infoimg.height * 1.5);
+  infoimg2.size(infoimg2.width * 0.75, infoimg2.height * 0.75);
   handpose.on("predict", (results) => {
-    detections = results;
-
-    // console.log(detections);
+    detections = results; // console.log(detections);
   });
   // godhands.push(new Customhand(detections[0]));
 }
@@ -44,7 +45,7 @@ let sketch = function (p) {
     canvas.position(0, 0);
     p.pixelDensity(1);
     p.frameRate(120);
-    p.textAlign( p.CENTER , p.CENTER ) ; 
+    p.textAlign(p.CENTER, p.CENTER);
     // capture = p.createCapture({
     //   video: {
     //     onFrame: async () => {
@@ -61,8 +62,18 @@ let sketch = function (p) {
     //   video.getBoundingClientRect().left,
     //   video.getBoundingClientRect().top
     // );
-    
-    video = p.createCapture(p.VIDEO); // new p5.Element(video);
+
+    video = p.createCapture({
+      audio: false,
+      video: {
+        facingMode: {
+          exact: "environment",
+        },
+      },
+      //video: {
+      //facingMode: "user"
+      //}
+    }); // new p5.Element(video);
     // video.hide();
     // p.resizeCanvas( video.width , video.height)  ;
     video.position(0, 0);
@@ -95,18 +106,40 @@ let sketch = function (p) {
     slider_curl.toxt.style("font-size", "20px");
 
     button_mirror = p.createButton("Mirror");
-    button_mirror.size(200, 60);
+    button_mirror.size(130, 60);
     button_mirror.style("font-size", "24px");
-    button_mirror.style("background-color", p.color(0, 162, 255));
+    button_mirror.style("background-color", p.color(0, 102, 255));
     button_mirror.style("color", p.color(255));
-    button_mirror.style("border-color", p.color(0, 162, 255));
+    button_mirror.style("border-color", p.color(0, 102, 255));
     button_mirror.style("border-radius", "15px");
-
     button_mirror.mousePressed(() => {
-      mirrar *= -1 ;
+      mirrar *= -1;
       video.style("transform", "scaleX(" + mirrar + ")");
       canvas.style("transform", "scaleX(" + mirrar + ")");
     });
+
+    // button_flip = p.createButton("Flip");
+    // button_flip.size(140, 60);
+    // button_flip.style("font-size", "24px");
+    // button_flip.style("background-color", p.color(0, 102, 255));
+    // button_flip.style("color", p.color(255));
+    // button_flip.style("border-color", p.color(0, 102, 255));
+    // button_flip.style("border-radius", "15px");
+    // button_flip.mousePressed(() => {
+    //   video.remove();
+    //   videoface = videoface == "environment" ? "user" : "environment";
+    //   video = p.createCapture({
+    //     audio: false,
+    //     video: {
+    //       facingMode: {
+    //         exact: videoface,
+    //       },
+    //     },
+    //     //video: {
+    //     //facingMode: "user"
+    //     //}
+    //   });
+    // });
 
     button_togglemark = p.createButton("Toggle Markers");
     button_togglemark.size(200, 60);
@@ -115,7 +148,6 @@ let sketch = function (p) {
     button_togglemark.style("color", p.color(255));
     button_togglemark.style("border-color", p.color(255, 0, 69));
     button_togglemark.style("border-radius", "15px");
-
     button_togglemark.mousePressed(() => {
       show_markers = !show_markers;
       button_togglemark.toxt.html(show_markers ? "ON" : "OFF");
@@ -131,7 +163,6 @@ let sketch = function (p) {
     button_toggleanimation.style("color", p.color(255));
     button_toggleanimation.style("border-color", p.color(255, 0, 69));
     button_toggleanimation.style("border-radius", "15px");
-
     button_toggleanimation.mousePressed(() => {
       animation_working = !animation_working;
       button_toggleanimation.toxt.html(animation_working ? "ON" : "OFF");
@@ -149,9 +180,9 @@ let sketch = function (p) {
     infotext.style("color", p.color(220, 220, 220));
     infotext.style("font-size", "27px");
     infoimg = monapple.createImg("a.jpeg");
-    infoimg.size(infoimg.width * 1.5, infoimg.height * 1.5);
     infoimg2 = monapple.createImg("b.jpg");
-    infoimg2.size(infoimg2.width * 0.75, infoimg2.height * 0.75);
+    // infoimg.size(infoimg.width * 1.5, infoimg.height * 1.5);
+    // infoimg2.size(infoimg2.width * 0.75, infoimg2.height * 0.75);
     doms = [
       info,
       button_toggleanimation,
@@ -162,11 +193,11 @@ let sketch = function (p) {
       slider_resolution.toxt,
     ];
     // for( let i = doms.length -1 ; i > -1 ; --i ) doms[i].hide() ;
-      p.background(20, 22, 28);
+    p.background(20, 22, 28);
   };
   p.draw = function () {
     if (!readytoshow) {
-      p.background(20, 22, 28,69);
+      p.background(20, 22, 28, 69);
       p.textSize(20);
       p.noStroke();
       p.fill(255);
@@ -249,7 +280,6 @@ p5.disableFriendlyErrors = true;
 let monapple = new p5(sketch);
 
 function dom_stuff() {
-  // if (!readytoshow) return;
   slider_resolution.position(
     canvas.position().x + 150,
     canvas.position().y + canvas.height * zoomscale + 20
@@ -267,9 +297,13 @@ function dom_stuff() {
     canvas.position().y + canvas.height * zoomscale + 68
   );
   button_mirror.position(
-    canvas.position().x + monapple.windowWidth - 230 ,
-    canvas.position().y + canvas.height * zoomscale 
+    canvas.position().x + monapple.windowWidth - 160,
+    canvas.position().y + canvas.height * zoomscale
   );
+  // button_flip.position(
+  //   canvas.position().x + monapple.windowWidth - 170,
+  //   canvas.position().y + canvas.height * zoomscale + 80
+  // );
   button_togglemark.position(
     canvas.position().x,
     canvas.position().y + 80 + canvas.height * zoomscale + 30
@@ -294,6 +328,7 @@ function dom_stuff() {
     canvas.position().x + 10,
     canvas.position().y + canvas.height * zoomscale + 420
   );
+  if (!readytoshow) return;
   infoimg.position(
     canvas.position().x - infoimg.width / 2 + (canvas.width * zoomscale) / 2,
     canvas.position().y + canvas.height * zoomscale + 900
